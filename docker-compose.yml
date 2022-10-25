@@ -1,0 +1,76 @@
+version: '1'
+
+services:
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: postgre_db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=agreg
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=12345
+
+eureka-server:
+  image: 'eureka-server-img:latest'
+  build: ./
+  ports:
+    - "8761:8761"
+  container_name: eureka-server
+  depends_on:
+    - config
+
+api-gateway:
+  image: 'api-gateway-img:latest'
+  build: ./
+  ports:
+    - "8080:8080"
+  container_name: api-gateway
+  depends_on:
+    - eureka-server
+  environment:
+    - EUREKA_URI=http://localhost:8761/eureka
+
+company-api:
+  image: 'company-api-img:latest'
+  build: ./
+  ports:
+    - "8081:8081"
+  container_name: company-api
+  depends_on:
+    - eureka-server
+    - gateway
+    - db
+  environment:
+    - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/agreg?currentSchema=company
+    - SPRING_DATASOURCE_USERNAME=root
+    - SPRING_DATASOURCE_PASSWORD=12345
+
+api-users:
+  image: 'api-users-img:latest'
+  build: ./
+  ports:
+    - "8082:8082"
+  container_name: api-users
+  depends_on:
+    - company-api
+  environment:
+    - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/agreg?currentSchema=users
+    - SPRING_DATASOURCE_USERNAME=root
+    - SPRING_DATASOURCE_PASSWORD=12345
+
+items-api:
+  image: 'maven-microservice-internship-item-api:latest'
+  build: ./
+  ports:
+    - "8083:8083"
+  container_name: item-api
+  depends_on:
+    - company-api
+  environment:
+    - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/agreg?currentSchema=item
+    - SPRING_DATASOURCE_USERNAME=root
+    - SPRING_DATASOURCE_PASSWORD=12345
+
+
+
