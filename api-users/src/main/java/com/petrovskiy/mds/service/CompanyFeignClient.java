@@ -3,6 +3,7 @@ package com.petrovskiy.mds.service;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import com.petrovskiy.mds.service.dto.CompanyDto;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import java.util.List;
 @FeignClient(name = "user-company", contextId = "second", url = "http://localhost:8081/api")
 public interface CompanyFeignClient {
 
+    @LoadBalanced
     @RequestMapping(method = RequestMethod.GET, value = "/companies")
     List<CompanyDto> getCompanies();
 

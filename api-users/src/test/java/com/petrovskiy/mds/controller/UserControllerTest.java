@@ -2,6 +2,7 @@ package com.petrovskiy.mds.controller;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.petrovskiy.mds.service.dto.CompanyDto;
 import com.petrovskiy.mds.service.dto.UserDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -13,12 +14,11 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserControllerTest {
@@ -27,6 +27,7 @@ class UserControllerTest {
     private WebTestClient webTestClient;
 
     private UserDto userDto;
+    private CompanyDto companyDto;
 
     @RegisterExtension
     static WireMockExtension wireMockServer = WireMockExtension.newInstance()
@@ -65,7 +66,11 @@ class UserControllerTest {
 
     @Test
     void findByIdHystrixCompany() {
-        userDto = UserDto.builder().id(UUID.fromString("bca0d2f3-57f8-449f-84b7-1dc50e3ee19d")).email("gf@gmail.com").build();
+        companyDto.setName("comp");
+        companyDto.setId(2L);
+        companyDto.setEmail("rew@fds.com");
+        userDto = UserDto.builder().id(UUID.fromString("bca0d2f3-57f8-449f-84b7-1dc50e3ee19d")).email("gf@gmail.com").name("fdsgfd")
+                        .username("we1").updated(LocalDateTime.parse("2022-10-16 18:41:22.495227")).companyDto(companyDto).build();
         wireMockServer.stubFor(
                 WireMock.get(WireMock.urlEqualTo("/api/users/bca0d2f3-57f8-449f-84b7-1dc50e3ee19d"))
                         .willReturn(aResponse()
@@ -79,7 +84,7 @@ class UserControllerTest {
                 .uri("/api/users/bca0d2f3-57f8-449f-84b7-1dc50e3ee19d\"")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().jsonPath("$.length()").isEqualTo(8);
+                .expectBody().jsonPath("$.length()").isEqualTo(1);
     }
 
 
