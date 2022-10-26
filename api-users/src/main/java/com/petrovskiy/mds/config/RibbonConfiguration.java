@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 public class RibbonConfiguration {
 
     @Autowired
-    IClientConfig ribbonClientConfig;
+    private IClientConfig ribbonClientConfig;
 
     @Bean
     public IPing ribbonPing(IClientConfig config) {

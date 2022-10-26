@@ -56,9 +56,9 @@ public class LoadBalancedTest {
         }
 
         mockBooksService.verify(
-                moreThan(0), getRequestedFor(WireMock.urlEqualTo("/api/companies")));
+                moreThan(0), getRequestedFor(WireMock.urlEqualTo("/companies")));
         secondMockBooksService.verify(
-                moreThan(0), getRequestedFor(WireMock.urlEqualTo("/api/companies")));
+                moreThan(0), getRequestedFor(WireMock.urlEqualTo("/companies")));
     }
 
     @Test
