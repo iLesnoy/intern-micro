@@ -16,17 +16,17 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 public class RibbonConfigurationTest {
 
     @Autowired
-    private WireMockServer mockBooksService;
+    private WireMockServer mockCompService;
 
     @Autowired
-    private WireMockServer secondMockBooksService;
+    private WireMockServer secondMockCompService;
 
-    @Bean(initMethod = "start", destroyMethod = "stop")
+    @Bean(name = "mockCompService", initMethod = "start", destroyMethod = "stop")
     public WireMockServer mockBooksService() {
         return new WireMockServer(options().dynamicPort());
     }
 
-    @Bean(name="secondMockBooksService", initMethod = "start", destroyMethod = "stop")
+    @Bean(name="secondMockCompService", initMethod = "start", destroyMethod = "stop")
     public WireMockServer secondBooksMockService() {
         return new WireMockServer(options().dynamicPort());
     }
@@ -34,8 +34,8 @@ public class RibbonConfigurationTest {
     @Bean
     public ServerList<Server> ribbonServerList() {
         return new StaticServerList<>(
-                new Server("localhost", mockBooksService.port()),
-                new Server("localhost", secondMockBooksService.port()));
+                new Server("localhost", mockCompService.port()),
+                new Server("localhost", secondMockCompService.port()));
     }
 
 }

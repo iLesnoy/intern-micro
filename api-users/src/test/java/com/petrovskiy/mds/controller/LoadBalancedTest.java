@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.petrovskiy.mds.config.RibbonConfigurationTest;
 import com.petrovskiy.mds.service.CompanyFeignClient;
 import com.petrovskiy.mds.service.dto.CompanyDto;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.moreThan;
@@ -24,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @EnableConfigurationProperties
+@Slf4j
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { RibbonConfigurationTest.class })
 public class LoadBalancedTest {
@@ -37,6 +40,8 @@ public class LoadBalancedTest {
     @Autowired
     private CompanyFeignClient clientService;
 
+    private Logger logger;
+
     @BeforeEach
     void setUp() throws IOException {
         setupMockCompanyResponse(mockBooksService);
@@ -46,13 +51,14 @@ public class LoadBalancedTest {
     @Test
     void whenGetCompanies_thenRequestsAreLoadBalanced() {
         for (int k = 0; k < 10; k++) {
+            logger.info(clientService.getCompanies().toString());
             clientService.getCompanies();
         }
 
         mockBooksService.verify(
-                moreThan(0), getRequestedFor(WireMock.urlEqualTo("/companies")));
+                moreThan(0), getRequestedFor(WireMock.urlEqualTo("/api/companies")));
         secondMockBooksService.verify(
-                moreThan(0), getRequestedFor(WireMock.urlEqualTo("/companies")));
+                moreThan(0), getRequestedFor(WireMock.urlEqualTo("/api/companies")));
     }
 
     @Test
